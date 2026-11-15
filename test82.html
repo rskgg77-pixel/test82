@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Study Timetable</title>
+<style>
+:root{--bg:#fbf6f3;--card:#fff;--tx:#3a3340;--mu:#8a8190;--ln:#e6dde0;--ac:#b79ad6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1a21;--card:#28242d;--tx:#eee8f0;--mu:#a49aab;--ln:#3d3743}}
+:root[data-theme="dark"]{--bg:#1d1a21;--card:#28242d;--tx:#eee8f0;--mu:#a49aab;--ln:#3d3743}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px system-ui,sans-serif;padding-bottom:70px}
+h1{font:600 22px Georgia,serif;text-align:center;margin:14px 0 2px;letter-spacing:1px}
+.sub{text-align:center;font-size:10px;letter-spacing:2px;color:var(--mu);margin-bottom:10px}
+.box{background:var(--card);border:1px solid var(--ln);border-radius:12px;margin:10px 12px;padding:10px}
+.box h3{margin:0 0 8px;font-size:12px;letter-spacing:1.5px;color:var(--mu)}
+input[type=text],textarea,select{width:100%;border:0;border-bottom:1px solid var(--ln);background:transparent;color:var(--tx);font:inherit;padding:6px 2px;outline:0}
+textarea{border:1px solid var(--ln);border-radius:8px;padding:8px;min-height:140px}
+.row{display:flex;align-items:center;gap:8px;margin:4px 0}
+.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--ac)}
+.tab{display:none}.tab.on{display:block}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;color:var(--mu);padding:12px 0;font:600 12px system-ui}
+nav button.on{color:var(--ac);border-top:3px solid var(--ac);margin-top:-1px}
+.wrap{overflow-x:auto;margin:10px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--card)}
+table{border-collapse:separate;border-spacing:0;min-width:620px;width:100%}
+th{font-size:11px;padding:8px 2px;position:sticky;top:0}
+th,td{border-right:1px solid var(--ln);border-bottom:1px solid var(--ln)}
+td{height:44px;font-size:11px;text-align:center;padding:2px;vertical-align:middle;word-break:break-word}
+td.t{position:sticky;left:0;background:#e3e0f0;color:#3a3340;font-size:10px;width:70px;min-width:70px;z-index:1}
+td.c{cursor:pointer}
+.dot{width:26px;height:26px;border-radius:50%;border:2px solid var(--ln);flex:none;position:relative}
+input[type=color]{opacity:0;position:absolute;inset:0;width:100%;height:100%}
+.pm{text-align:center}.big{font:700 64px system-ui;margin:10px 0}
+.btn{border:0;border-radius:24px;padding:12px 22px;margin:4px;background:var(--ac);color:#fff;font:600 15px system-ui}
+.btn.g{background:var(--ln);color:var(--tx)}
+.days{display:flex;justify-content:space-around}
+.days label{display:flex;flex-direction:column;align-items:center;font-size:11px;gap:6px}
+.days input{width:30px;height:30px;accent-color:#7fbf9a}
+.tip{margin:6px 0;font-size:14px}
+#dlg{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:9}
+#dlg>div{background:var(--card);width:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));border-radius:16px 16px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{padding:8px 12px;border-radius:16px;font-size:13px;border:2px solid transparent;color:#3a3340}
+.chip.on{border-color:var(--tx)}
+</style></head><body>
+<h1>STUDY TIMETABLE</h1><div class="sub">STAY CONSISTENT • STAY FOCUSED</div>
+
+<section class="tab on" id="t0">
+ <div class="box"><div class="row">Name <input type="text" data-k="name"></div><div class="row">Week <input type="text" data-k="week"></div><div class="row">Dates <input type="text" data-k="dates"></div></div>
+ <div class="wrap"><table id="tt"></table></div>
+ <div style="text-align:center;color:var(--mu);font-size:12px">Tap any box to edit • swipe sideways for weekend</div>
+</section>
+
+<section class="tab" id="t1">
+ <div class="box"><h3>🎯 WEEKLY GOALS</h3><div id="goals"></div></div>
+ <div class="box"><h3>📋 PRIORITY TASKS</h3><div id="prio"></div></div>
+ <div class="box"><h3>📚 SUBJECTS &amp; COLORS (tap dot to change)</h3><div id="subj"></div></div>
+ <div class="box"><h3>♡ MOTIVATION</h3><input type="text" data-k="quote"></div>
+</section>
+
+<section class="tab" id="t2">
+ <div class="box pm"><h3>⏱ POMODORO TIMER</h3>
+  <div class="row" style="justify-content:center">Study <input type="number" id="pS" value="25" min="1" style="width:56px"> min &nbsp; Break <input type="number" id="pB" value="5" min="1" style="width:56px"> min</div>
+  <div id="mode" style="color:var(--mu)">Study time</div><div class="big" id="clk">25:00</div>
+  <button class="btn" id="go">Start</button><button class="btn g" id="rs">Reset</button>
+  <div style="color:var(--mu);margin-top:8px">Sessions done today: <b id="cnt">0</b></div></div>
+ <div class="box"><h3>DAILY PROGRESS TRACKER</h3><div class="days" id="days"></div></div>
+ <div class="box"><h3>💡 STUDY TIPS</h3>
+  <div class="tip">⏱ Use Pomodoro: 25 min study + 5 min break.</div><div class="tip">📵 Avoid distractions, keep your phone away.</div><div class="tip">💧 Take short breaks, stay hydrated.</div><div class="tip">🌙 Review before bed to retain better.</div></div>
+</section>
+
+<section class="tab" id="t3"><div class="box"><h3>📝 NOTES</h3><textarea data-k="notes" placeholder="Write your notes..."></textarea></div>
+ <div class="box"><button class="btn g" id="th">Toggle dark mode</button><button class="btn g" id="clr">Clear timetable</button></div></section>
+
+<nav><button class="on" data-t="0">📅<br>Timetable</button><button data-t="1">🎯<br>Plan</button><button data-t="2">⏱<br>Focus</button><button data-t="3">📝<br>Notes</button></nav>
+
+<div id="dlg"><div><b id="dh"></b><input type="text" id="dt" placeholder="What will you study?"><div class="chips" id="dc"></div>
+ <button class="btn" id="ds">Save</button><button class="btn g" id="dx">Cancel</button><button class="btn g" id="dd">Delete</button></div></div>
+
+<script>
+const D=['MON','TUE','WED','THU','FRI','SAT','SUN'],DC=['#f6d5c3','#fbe9b7','#cfe6cf','#f6c9d0','#d6cbec','#c5dcef','#f6d5c3'];
+const H=[];for(let h=6;h<22;h++){const f=x=>(x%12||12);H.push(f(h)+':00-'+f(h+1)+':00 '+(h+1>=12&&h+1<24?'pm':'am'))}
+const def={name:'',week:'',dates:'',quote:'Small progress every day leads to big results.',notes:'',
+goals:[['',0],['',0],['',0]],prio:[['',0],['',0],['',0],['',0],['',0]],
+subj:[['Math','#f4b6c2'],['Science','#f9d5a7'],['English','#b9dcb9'],['History','#aed3ee'],['Art','#cbb8e6'],['Other','#c2c2c2']],
+cells:{},prog:[0,0,0,0,0,0,0],cnt:0};
+let S;try{S=Object.assign({},def,JSON.parse(localStorage.getItem('study')||'{}'))}catch(e){S=def}
+const save=()=>{try{localStorage.setItem('study',JSON.stringify(S))}catch(e){}};
+const $=i=>document.getElementById(i);
+document.querySelectorAll('[data-k]').forEach(e=>{e.value=S[e.dataset.k]||'';e.oninput=()=>{S[e.dataset.k]=e.value;save()}});
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');$('t'+b.dataset.t).classList.add('on')});
+function table(){let h='<tr><th style="background:#d9d7ec;color:#3a3340">TIME</th>'+D.map((d,i)=>`<th style="background:${DC[i]};color:#3a3340">${d}</th>`).join('')+'</tr>';
+H.forEach((t,r)=>{h+=`<tr><td class="t">${t}</td>`+D.map((d,c)=>{const v=S.cells[c+'-'+r];return `<td class="c" data-c="${c}" data-r="${r}" style="${v?'background:'+v.s:''};${v?'color:#3a3340':''}">${v?v.t:''}</td>`}).join('')+'</tr>'});$('tt').innerHTML=h}
+let cur,sel='';
+$('tt').onclick=e=>{const td=e.target.closest('td.c');if(!td)return;cur=td.dataset.c+'-'+td.dataset.r;const v=S.cells[cur]||{t:'',s:''};sel=v.s;
+$('dh').textContent=D[td.dataset.c]+' • '+H[td.dataset.r];$('dt').value=v.t;chips();$('dlg').style.display='flex'};
+function chips(){$('dc').innerHTML=S.subj.map((s,i)=>`<span class="chip ${sel===s[1]?'on':''}" style="background:${s[1]}" data-c="${s[1]}" data-n="${s[0]}">${s[0]||'•'}</span>`).join('')}
+$('dc').onclick=e=>{const c=e.target.closest('.chip');if(!c)return;sel=c.dataset.c;if(!$('dt').value)$('dt').value=c.dataset.n;chips()};
+$('ds').onclick=()=>{const t=$('dt').value.trim();if(t||sel)S.cells[cur]={t,s:sel||'#eee'};else delete S.cells[cur];save();table();$('dlg').style.display='none'};
+$('dd').onclick=()=>{delete S.cells[cur];save();table();$('dlg').style.display='none'};
+$('dx').onclick=()=>$('dlg').style.display='none';
+$('clr').onclick=()=>{if(confirm('Clear the whole timetable?')){S.cells={};save();table()}};
+$('th').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'};
+function list(id,key,box,n){$(id).innerHTML=S[key].map((g,i)=>`<div class="row">${box?`<input type="checkbox" ${g[1]?'checked':''} data-i="${i}">`:`<b>${i+1}</b>`}<input type="text" value="${g[0].replace(/"/g,'&quot;')}" data-i="${i}" style="${box&&g[1]?'text-decoration:line-through;color:var(--mu)':''}"></div>`).join('');
+$(id).oninput=e=>{const i=e.target.dataset.i;if(e.target.type==='checkbox')S[key][i][1]=e.target.checked?1:0;else S[key][i][0]=e.target.value;save()};
+$(id).onchange=e=>{if(e.target.type==='checkbox')list(id,key,box)}}
+list('goals','goals',1);list('prio','prio',1);
+function subj(){$('subj').innerHTML=S.subj.map((s,i)=>`<div class="row"><span class="dot" style="background:${s[1]}"><input type="color" value="${s[1]}" data-i="${i}"></span><input type="text" value="${s[0]}" data-i="${i}"></div>`).join('')}
+subj();$('subj').oninput=e=>{const i=e.target.dataset.i;if(e.target.type==='color'){S.subj[i][1]=e.target.value;e.target.parentNode.style.background=e.target.value}else S.subj[i][0]=e.target.value;save()};
+$('subj').onchange=()=>{subj();table()};
+$('days').innerHTML=D.map((d,i)=>`<label>${d}<input type="checkbox" ${S.prog[i]?'checked':''} data-i="${i}"></label>`).join('');
+$('days').onchange=e=>{S.prog[e.target.dataset.i]=e.target.checked?1:0;save()};
+// Pomodoro
+let study=1,left=25*60,tm=null;$('cnt').textContent=S.cnt;
+const show=()=>{$('clk').textContent=String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');$('mode').textContent=study?'Study time':'Break time'};
+function beep(){try{const a=new AudioContext(),o=a.createOscillator();o.connect(a.destination);o.start();o.stop(a.currentTime+.6)}catch(e){}try{navigator.vibrate([300,150,300])}catch(e){}}
+let end=0;
+function tick(){left=Math.max(0,Math.round((end-Date.now())/1000));show();if(left<=0){beep();if(study){S.cnt++;$('cnt').textContent=S.cnt;save()}study=!study;left=(study?$('pS').value:$('pB').value)*60;end=Date.now()+left*1000;show()}}
+$('go').onclick=()=>{if(tm){clearInterval(tm);tm=null;$('go').textContent='Resume'}else{end=Date.now()+left*1000;tm=setInterval(tick,500);$('go').textContent='Pause'}};
+$('rs').onclick=()=>{clearInterval(tm);tm=null;study=1;left=$('pS').value*60;$('go').textContent='Start';show()};
+$('pS').onchange=()=>{if(!tm&&study){left=$('pS').value*60;show()}};
+table();
+</script></body></html>
